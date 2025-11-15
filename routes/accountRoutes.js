@@ -16,6 +16,23 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
+// GET all transactions for logged-in user
+router.get("/transactions", authMiddleware, async (req, res) => {
+  try {
+    const accounts = await Account.find({ userId: req.user.userId });
+    const accountIds = accounts.map(acc => acc._id);
+
+    const transactions = await Transaction.find({
+      accountId: { $in: accountIds }
+    }).sort({ date: -1 });
+
+    res.json(transactions);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 // GET transactions for a specific account
 router.get("/:accountId/transactions", authMiddleware, async (req, res) => {
   try {

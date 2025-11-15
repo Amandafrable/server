@@ -1,18 +1,20 @@
 import express from "express";
 import mongoose from "mongoose";
-import cors from "cors";  // <-- Import cors package
+import cors from "cors"; 
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
-import accountRoutes from "./routes/accountRoutes.js";   // <-- Ensure you're importing your account routes
+import accountRoutes from "./routes/accountRoutes.js";
 import auth from "./middleware/auth.js";
 
 dotenv.config();
 const app = express();
 
-// CORS configuration
+// Allow requests from any origin
 app.use(cors({
-  origin: process.env.FRONTEND_ORIGIN || "*", 
-  credentials: true, 
+  origin: function(origin, callback) {
+    callback(null, true); 
+  },
+  credentials: true       
 }));
 
 app.use(express.json());
@@ -25,7 +27,7 @@ mongoose.connect(process.env.MONGO_URI, {
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// Define Routes
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/accounts", accountRoutes);
 
